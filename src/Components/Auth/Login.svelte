@@ -1,8 +1,9 @@
 <script>
 	import Signup from './Signup.svelte';
 	import { Link } from 'svelte-navigator';
-import { debug, onMount } from "svelte/internal";
-import { windowPort } from '../../Utilities/Sizers'
+  import { debug, onMount } from "svelte/internal";
+  import { windowPort } from '../../Utilities/Sizers'
+import { getFromListStore } from '../../Utilities/storage';
   
 
  
@@ -19,15 +20,9 @@ import { windowPort } from '../../Utilities/Sizers'
     invalidPassword = null;
     if(!/\w+@\w+\.\w+$/.test(email)) return invalidEmail = true;
     if(password.trim().length < 6) return invalidPassword = true;
-    if(localStorage.hasOwnProperty('users')){
-      let users = JSON.parse(localStorage.users);
-      account= users.find(data=>data.email == email && data.password == password);
-      if(!account) return userNotFound = true;
-      // {@debug account}
-      console.log(account);
-    }else{
-      return userNotFound = true;
-    }
+    let account = getFromListStore('users', {email,password});
+    if(!account) return userNotFound = true;
+    
   }
 
   const sizer=()=> {
@@ -78,8 +73,11 @@ import { windowPort } from '../../Utilities/Sizers'
           <div class="flez"><small>Invalid credentials</small></div>
         {/if}
       </form>
-      <div class="flez mm ">
-        Are you new here? Please  <Link class="white" to="/signup" > Signup</Link>
+      <div class="flez mm mb">
+        <span> Are you new here? Please </span> &nbsp;
+        <Link style="color:yellow; text-decoration: none" to="/signup">
+          Signup here
+        </Link>
       </div>
 
     </div>
@@ -124,6 +122,10 @@ import { windowPort } from '../../Utilities/Sizers'
     margin: 10px 0px;
   }
 
+  .mb{
+    margin-bottom: 15px;
+  }
+
   .med-font{
     font-size: medium;
     font-weight: 600;
@@ -144,5 +146,8 @@ import { windowPort } from '../../Utilities/Sizers'
     background: linear-gradient(to right, rgba(40,55,200, 0.9), rgba(40,65,200, 0.9), rgba(40,85,200, 0.9)),
 		linear-gradient(to left, rgba(36, 22, 235, 0.9), rgba(40, 30, 175, 0.9));
 		;
+  }
+  .no-dec{
+    text-decoration: none !important;
   }
 </style>

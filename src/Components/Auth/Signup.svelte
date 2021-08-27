@@ -1,11 +1,13 @@
 <script>
-
-import { debug, onMount } from "svelte/internal";
-import { windowPort } from '../../Utilities/Sizers'
+	import { putUniqueToStore } from './../../Utilities/storage.js';
+  import { Link } from 'svelte-navigator';
+  import { debug, onMount } from "svelte/internal";
+  import { windowPort } from '../../Utilities/Sizers'
   
 
  
   let size= windowPort();
+  let errorMessage = ""
   let username="";
   let email = "";
   let password ="";  
@@ -16,17 +18,14 @@ import { windowPort } from '../../Utilities/Sizers'
   const submit=()=>{
     invalidEmail = null;
     invalidPassword = null;
+    errorMessage = "";
+    invalidUsername = null;
+    completed = false;
     if(!/\w+@\w+\.\w+$/.test(email)) return invalidEmail = true;
+    if(!/\w{3,}$/.test(username.trim())) return invalidUsername = true;
     if(password.trim().length < 6) return invalidPassword = true;
-    if(username.trim().length < 6) return invalidPassword = true;
-    if(localStorage.hasOwnProperty('users')){
-      let users = JSON.parse(localStorage.users);
-      users = [...users, {username,email,password}]
-      localStorage.users = JSON.stringify(users)
-      console.log(users);
-    }else{
-      localStorage.users = JSON.stringify([{username,email,password}])
-    }
+    let isDone = putUniqueToStore('users',  {username,email,password}, 'email');
+    if(!isDone) return errorMessage = "Account already exists."
     completed = true;
   }
 
@@ -63,7 +62,9 @@ import { windowPort } from '../../Utilities/Sizers'
         <input placeholder="username" bind:value={username}  name="username" />
         {#if invalidUsername}
           <div class="flez">
-            <small>Username is required and must be minimum of 3 characters</small>
+            <small>
+              Username is required and must be minimum of 3 non special characters
+            </small>
           </div>        
         {/if}
       </div>
@@ -79,13 +80,24 @@ import { windowPort } from '../../Utilities/Sizers'
       <div class="mm flez"> 
         <button class="bdr white med-font" type="submit">Submit</button>
       </div>
-      {#if completed}
-        <div>
-          <div>Registration completed, please continue</div>
-          <button >Continue</button>
-        </div>      
-      {/if}
+      <div class="flez mm mb">
+        <span> Already have an account? Please </span> &nbsp;
+        <Link style="color:yellow; text-decoration: none" to="/">
+          Login here
+        </Link>
+      </div>
     </form>
+    {#if errorMessage}
+      <div class="flez">
+        <small>{errorMessage}</small>
+      </div>      
+    {/if}
+    {#if completed}
+      <div>
+        <div>Registration completed, please continue</div>
+        <button >Continue</button>
+      </div>      
+    {/if}
   </div>
 </div>
 
