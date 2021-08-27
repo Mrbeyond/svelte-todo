@@ -8,7 +8,7 @@ import { getFromListStore } from '../../Utilities/storage';
 
  
   let size= windowPort();
-  
+  let contain = true;
   let email = "";
   let password ="";
   let invalidEmail = null;
@@ -22,6 +22,7 @@ import { getFromListStore } from '../../Utilities/storage';
     if(password.trim().length < 6) return invalidPassword = true;
     let account = getFromListStore('users', {email,password});
     if(!account) return userNotFound = true;
+    localStorage.user = JSON.stringify(account);
     
   }
 
@@ -37,7 +38,7 @@ import { getFromListStore } from '../../Utilities/storage';
 
 </script>
 
-<div class="contain bdr white ">
+<div class:contain class="bdr white ">
   <div>
     <div class='flez'>
       {#if size == 3}
@@ -85,69 +86,5 @@ import { getFromListStore } from '../../Utilities/storage';
 </div>
 
 <style>
-  .contain{
-    box-sizing: border-box;
-    padding: 0px 20px;
-    width: 100% !important;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-    background-image:  linear-gradient(180deg, rgba(23,103,245, 0.7) 30%, rgba(34,145,227, 0)),
-      linear-gradient(120deg, rgba(41,143,220, 0.8), rgba(34,175,240, 0.8) 40%),
-      linear-gradient(230deg, rgba(25, 100, 240, 0.9) 35%, rgba(255,255,255,0) 30%),
-      linear-gradient(-35deg, rgba(25, 90, 220, 0.5) 40%, rgba(255,255,255,0) 31%);
-  }
-  .red{
-    color: red;
-  }
-  .white{
-    color:white !important;
-  }
-  .bdr{
-    border-radius: 10px;
-  }
-  .flez{
-    display: flex;
-    justify-content: center;
-  }
-
-  .label{
-    font-size: large;
-    font-weight: 600;
-    padding-left: 2px;
-    margin-bottom: 5px;     
-  }
-
-  .mm{
-    margin: 10px 0px;
-  }
-
-  .mb{
-    margin-bottom: 15px;
-  }
-
-  .med-font{
-    font-size: medium;
-    font-weight: 600;
-  }
-
-  input{
-    border-radius: 10px;
-    border: none;
-    width: 100%;
-  }
-  input:focus{
-    border: 0px;
-  }
-  button{
-    border: none;
-    max-width: 200px;
-    width: 65%;
-    background: linear-gradient(to right, rgba(40,55,200, 0.9), rgba(40,65,200, 0.9), rgba(40,85,200, 0.9)),
-		linear-gradient(to left, rgba(36, 22, 235, 0.9), rgba(40, 30, 175, 0.9));
-		;
-  }
-  .no-dec{
-    text-decoration: none !important;
-  }
+ 
 </style>

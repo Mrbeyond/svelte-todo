@@ -5,7 +5,7 @@ export const putToStore=(store, payload)=>{
   let newData;
   if(localStorage.hasOwnProperty(store)){
     let data = JSON.parse(localStorage[store]);
-    let newData = [...{...data, id: data.length+1}, payload];
+    newData = [...data, {...payload, id: data.length+1}];
     localStorage[store] = JSON.stringify(newData);
   }else{
     newData = [{...payload, id:1}];
@@ -16,18 +16,22 @@ export const putToStore=(store, payload)=>{
   return newData;
 }
 
+/**
+ * Adds  unique new data to localstorage
+*/
 export const putUniqueToStore=(store, payload, unique)=>{
-  let newData;
+  let newData, current;
   if(localStorage.hasOwnProperty(store)){
     let data = JSON.parse(localStorage[store]);
     if(data.some(e=>e[unique] == payload[unique])) return false;
-    let newData = [...{...data, id: data.length+1}, payload];
+    current = {...payload, id: data.length+1};
+    newData = [...data, current, ];
     localStorage[store] = JSON.stringify(newData);
   }else{
-    newData = [{...payload, id:1}];
+    current = {...payload, id:1}
+    newData = [current];
     localStorage[store] = JSON.stringify(newData);
   }
-  
   console.log(newData);
   return newData;
 }
@@ -42,6 +46,7 @@ export const getStore=(store)=>{
   }
 }
 
+/** Fetch out localstorage items of type <Map>  */
 export const getFromMapStore=(store, payload)=>{
   let storeContent = getStore(store);
   if(!storeContent) return null;
@@ -50,6 +55,8 @@ export const getFromMapStore=(store, payload)=>{
     
 }
 
+
+/** Fetch out localstorage items of type <List>  */
 export const getFromListStore=(store, payload)=>{
   let storeContent = getStore(store);
   console.log(storeContent);
@@ -58,7 +65,39 @@ export const getFromListStore=(store, payload)=>{
   console.log(keys);
   let data = storeContent.find(e=> keys.every(d=> e[d] == payload[d]));
   if(!data) return null;
-  return data;
+  return data;    
+}
 
-    
+
+/** Map status to todos */
+export const mapTodo=()=>{
+  let todos = getStore('todos');
+  if(!todos) return null;
+  return todos.map(todo=>{
+    let status = new Date(new Date().toDateString()) > new Date(todo.date)? 0: 1;
+    return {...todo, status};
+  })
+}
+
+
+/** Filters out todo with future or present date */
+export const mapActiveTodo=()=>{
+  let todos = getStore('todos');
+  if(!todos) return null;
+  return todos.filter(e=>new Date(new Date().toDateString()) > new Date(e.date))
+  .map(todo=>{
+    let status = new Date(new Date().toDateString()) > new Date(todo.date)? 0: 1;
+    return {...todo, status};
+  })
+}
+
+/** Filters out todo with elapsed date */
+export const mapUnactiveTodo=()=>{
+  let todos = getStore('todos');
+  if(!todos) return null;
+  return todos.filter(e=>new Date(new Date().toDateString()) > new Date(e.date))
+  .map(todo=>{
+    let status = new Date(new Date().toDateString()) > new Date(todo.date)? 0: 1;
+    return {...todo, status};
+  })
 }
