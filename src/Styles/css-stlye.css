@@ -11,6 +11,13 @@
     linear-gradient(-35deg, rgba(25, 90, 220, 0.5) 40%, rgba(255,255,255,0) 31%);
 }
 
+.box{
+  box-sizing: border-box;
+  padding: 0px 20px;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
 .red{
   color: red;
 }
