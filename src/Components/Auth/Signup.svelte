@@ -79,7 +79,7 @@
         {/if}
       </div>
       <div class="mm flez"> 
-        <button class="bdr white med-font" type="submit">Submit</button>
+        <button class="bdr white med-font f-btn" type="submit">Submit</button>
       </div>
       <div class="flez mm mb">
         <span> Already have an account? Please </span> &nbsp;

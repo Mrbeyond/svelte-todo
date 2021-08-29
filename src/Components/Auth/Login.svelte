@@ -68,7 +68,7 @@ import { getFromListStore } from '../../Utilities/storage';
           {/if}
         </div>
         <div class="mm flez">
-          <button class="bdr white med-font" type="submit">Submit</button>
+          <button class="bdr white med-font f-btn" type="submit">Submit</button>
         </div>
         {#if  userNotFound}
           <div class="flez"><small>Invalid credentials</small></div>

@@ -72,7 +72,7 @@
         {/if}
       </div>
       <div class="mm flez"> 
-        <button class="bdr white med-font" type="submit">ADD</button>
+        <button class="bdr white f-btn med-font" type="submit">ADD</button>
       </div>
     </form>
     {#if errorMessage}
