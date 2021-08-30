@@ -1,43 +1,93 @@
-<!-- <script>
-  // import DataTable, { Head, Body, Row, Cell, Label } from '@smui/data-table';
-  import { mapTodo } from '../../Utilities/storage';
-  import Fa from 'svelte-fa'
+<script>
+	import { todos, open } from './../../Store/store.js';
+  import { mapTodo, replaceStore } from '../../Utilities/storage';
+  import Fa from 'svelte-fa';
   import { faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons';
   import Dialog, { Title, Content, Actions } from '@smui/dialog';
+  import Button, { Label } from '@smui/button';
+  import AddTodo from '../Form/AddTodo.svelte';
+  import Checkbox from '@smui/checkbox';
   
   let heads = ['S/N', 'Title', 'Details', 'Time', 'Status', 'Actions' ];
-  let sizze = [5, 15, 40, 15, 10, 15];
   let pad;
-  let open = true;
+  
+  let title ="";
+  let details = "";
+  let date = "";
+  let id = null;
+  $: {
+    mapTodo();
+  }
 
+  let selectedTodo = {};
+
+  
   const getIndex=(obejct, data)=>{
     return Object.keys(obejct).findIndex(e=>e == data);
   }
   
-  let todos = mapTodo();
-  $: console.log(todos);
+  const deleteTodo=(id)=>{
+    let tempTodo  = [...$todos];
+    if(!selectedTodo.id || (selectedTodo.id && selectedTodo.id != id)){
+      return selectedTodo = tempTodo.find(e=> e.id == id);
+    }
+    tempTodo = tempTodo.filter(e=>e.id != id);
+    replaceStore('todos', tempTodo);
+    selectedTodo = {};
+  }
+
+  const editTodo=(ID)=>{
+    let currentTodo = $todos.find(e=> e.id == ID);
+    title = currentTodo.title;
+    details = currentTodo.details;
+    date = currentTodo.date;
+    id = ID;
+    $open = true;
+  }
+
+  const addToTodo=()=>{
+    title ="";
+    details = "";
+    date = "";
+    id = null; 
+    $open = true;
+  }
 </script>
 
 
 <div class="bx-no-pd">
+  <!-- surface$style="padding: 0px" -->
   <Dialog
-    bind:open
+    bind:open={$open}
+    fullscreen
     aria-labbeledby="dialog-title"
     aria-described-by="dialog-content"
+    surface$style="padding:0px; width: 850px; max-width: calc(100vw - 32px);"
+
   >
     <Title id="dialog-title">
-      Add to todo
+      
     </Title>
-    <Content id="dialog-content">
-      here
+    <Content style="padding:10px 5px" id="dialog-content">
+      {#if $open}
+        <AddTodo {title} {date} {details} {id} />
+        
+      {/if}
     </Content>
+    <Actions>
+      <Button action="accept" default>
+        <Label style="color:white">Close</Label>
+      </Button>
+    </Actions>
   </Dialog>
+
   <div class="right"> 
-    <button on:click={()=>open=true} class="m-btn" style="margin-bottom: 0px;">More</button>
+    <Button on:click={addToTodo} class="m-btn white" style="margin-bottom: 0px;">ADD More</Button>
   </div>
   <hr>
   <table style=" width:100%; max-width:100%; ">    
     <caption> <strong>Todo List</strong> </caption>
+    <!-- table head -->
     <tr>
       {#each heads as head, i }
         <th class="cells th-c">{head}</th>
@@ -45,7 +95,7 @@
       <th></th>
     </tr>
     <!-- table body -->
-    {#each todos as todo, index }
+    {#each $todos as todo, index }
       <tr>
         <td> <span class:pad>{index+1}</span> </td>
         <td> <span class:pad>{todo.title}</span> </td>
@@ -54,12 +104,17 @@
         <td> 
           <span class:pad>
             {todo.status? 'Active':'Elapsed'}
+            <Checkbox on:change={()=>(todo.completed = !todo.completed, console.log(todo))} checked={todo.completed} />
           </span> 
         </td>
         <td> 
           <div class:pad>
-            <Fa icon={faTrashAlt} style="margin-right: 7px" size="lg" />
-            <Fa icon={faEdit} size="lg" />
+            <span class="{selectedTodo.id == todo.id?'red':'dpo'}" on:click={()=>deleteTodo(todo.id)} >
+              <Fa icon={faTrashAlt} style="margin-right: 7px" size="lg" />
+            </span>
+            <span class="th-c" on:click={()=>editTodo(todo.id)} >
+              <Fa icon={faEdit} size="lg" />
+            </span>
           </div>
         </td>
         </tr>
@@ -89,4 +144,4 @@
     text-align: left;
   }
 
-</style> 
+</style>

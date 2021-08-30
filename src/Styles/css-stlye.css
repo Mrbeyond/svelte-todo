@@ -26,8 +26,19 @@
   margin: 0px !important;
 }
 
+.bx-spd{  
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 8px !important;
+  margin: 0px !important;
+}
+
 .red{
   color: red;
+}
+.dpo{
+  color: orangered;
 }
 .white{
   color:white !important;
@@ -52,7 +63,10 @@
 }
 
 .mb{
-  margin-bottom: 15px;
+  margin-bottom: 15px !important;
+}
+.pb{
+  padding-bottom: 15px !important;
 }
 
 .med-font{

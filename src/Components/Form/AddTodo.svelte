@@ -1,16 +1,25 @@
 <script>
-	import { putToStore } from './../../Utilities/storage.js';
-  import { Link } from 'svelte-navigator';
-  import { debug, onMount } from "svelte/internal";
-  import { windowPort } from '../../Utilities/Sizers'
-  
+	import { open } from './../../Store/store.js';
+	import { getStore, putToStore, replaceStore } from './../../Utilities/storage.js';
+  import { Link, useNavigate } from 'svelte-navigator';
+  import { debug, onDestroy, onMount } from "svelte/internal";
+  import { windowPort } from '../../Utilities/Sizers';
 
- 
+  let user = getStore('user');
+
+ $: {
+    if(!user || !user.id){
+      useNavigate()('/');
+    }
+ }
+
   let size= windowPort();
   let errorMessage = ""
   export let title="";
   export let details = "";
-  export let date ="";  
+  export let date ="";
+  export let id = null; 
+
   let invalidDate = null;  
   let invalidTitle = null;
   let completed = false;
@@ -21,14 +30,31 @@
     completed = false;
     if(!title.trim()) return invalidTitle = true;
     if(!date.trim()) return invalidDate = true;
-    let isDone = putToStore('todos',  {title,details,date});
-    if(!isDone) return errorMessage = "Oops! Something went wrong, please retry"
+    const payload =  {title,details,date, completed: false, userId: user.id};
+    if(!id){
+      let isDone = putToStore('todos', payload);
+      if(!isDone) return errorMessage = "Oops! Something went wrong, please retry";
+    }else{
+      let data = getStore('todos');
+      let index = data.findIndex(e=>e.id == id);
+      data[index] = {...data[index], payload};
+      replaceStore('todos', data);
+      return open.set(false);
+       
+    }
+    title="";
+    details = "";
+    date ="";
     completed = true;
   }
 
   const sizer=()=> {
     size = windowPort();    
   }
+  
+  onDestroy(()=>{
+    window.removeEventListener('resize', sizer);
+  })
 
   onMount(()=>{
     window.addEventListener('resize', sizer);
@@ -72,7 +98,7 @@
         {/if}
       </div>
       <div class="mm flez"> 
-        <button class="bdr white f-btn med-font" type="submit">ADD</button>
+        <button class="bdr white f-btn med-font" type="submit">{id?"UPDATE":"ADD"}</button>
       </div>
     </form>
     {#if errorMessage}
@@ -81,9 +107,8 @@
       </div>      
     {/if}
     {#if completed}
-      <div>
-        <div>Successfully Added</div>
-        <button >Save and Add more</button><button >Save</button>
+      <div class="flez">
+        <div>New Todo successfully Added</div>
       </div>      
     {/if}
   </div>

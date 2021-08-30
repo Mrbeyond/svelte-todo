@@ -1,9 +1,9 @@
 <script>
 	import Signup from './Signup.svelte';
-	import { Link } from 'svelte-navigator';
+	import { Link, navigate } from 'svelte-navigator';
   import { debug, onMount } from "svelte/internal";
   import { windowPort } from '../../Utilities/Sizers'
-import { getFromListStore } from '../../Utilities/storage';
+import { getFromListStore, putToMapStore } from '../../Utilities/storage';
   
 
  
@@ -22,7 +22,8 @@ import { getFromListStore } from '../../Utilities/storage';
     if(password.trim().length < 6) return invalidPassword = true;
     let account = getFromListStore('users', {email,password});
     if(!account) return userNotFound = true;
-    localStorage.user = JSON.stringify(account);
+    putToMapStore('user', account);
+    navigate('/todo')
     
   }
 
@@ -74,7 +75,7 @@ import { getFromListStore } from '../../Utilities/storage';
           <div class="flez"><small>Invalid credentials</small></div>
         {/if}
       </form>
-      <div class="flez mm mb">
+      <div class="flez pb">
         <span> Are you new here? Please </span> &nbsp;
         <Link style="color:yellow; text-decoration: none" to="/signup">
           Signup here

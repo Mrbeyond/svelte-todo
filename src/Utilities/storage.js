@@ -1,11 +1,12 @@
-/**
- * Adds new data to localstorage
-*/
+import { todos, user } from "../Store/store";
+
+/** Adds new data to localstorage */
 export const putToStore=(store, payload)=>{
   let newData;
   if(localStorage.hasOwnProperty(store)){
     let data = JSON.parse(localStorage[store]);
-    newData = [...data, {...payload, id: data.length+1}];
+    let currentId = data[data.length-1]? data[data.length-1].id +1: 1
+    newData = [...data, {...payload, id: currentId}];
     localStorage[store] = JSON.stringify(newData);
   }else{
     newData = [{...payload, id:1}];
@@ -13,7 +14,19 @@ export const putToStore=(store, payload)=>{
   }
   
   console.log(newData);
+  if(store == 'todos'){
+    mapTodo();
+  }
   return newData;
+}
+
+export const replaceStore=(store, payload)=>{
+  localStorage[store] = JSON.stringify(payload);
+  
+  if(store == 'todos'){
+    todos.set(payload);
+  }
+  return payload;
 }
 
 /**
@@ -24,7 +37,9 @@ export const putUniqueToStore=(store, payload, unique)=>{
   if(localStorage.hasOwnProperty(store)){
     let data = JSON.parse(localStorage[store]);
     if(data.some(e=>e[unique] == payload[unique])) return false;
-    current = {...payload, id: data.length+1};
+    
+    let currentId = data[data.length-1]? data[data.length-1].id+1 : 1
+    current = {...payload, id: currentId};
     newData = [...data, current, ];
     localStorage[store] = JSON.stringify(newData);
   }else{
@@ -32,7 +47,11 @@ export const putUniqueToStore=(store, payload, unique)=>{
     newData = [current];
     localStorage[store] = JSON.stringify(newData);
   }
-  console.log(newData);
+
+  // if(store == 'users'){
+  //   users.set(newData);
+  // }
+  // console.log(newData);
   return newData;
 }
 
@@ -47,12 +66,9 @@ export const getStore=(store)=>{
 }
 
 /** Fetch out localstorage items of type <Map>  */
-export const getFromMapStore=(store, payload)=>{
-  let storeContent = getStore(store);
-  if(!storeContent) return null;
-
-
-    
+export const putToMapStore=(store, payload)=>{
+  localStorage[store] = JSON.stringify(payload);
+  user.set(payload); 
 }
 
 
@@ -65,20 +81,33 @@ export const getFromListStore=(store, payload)=>{
   console.log(keys);
   let data = storeContent.find(e=> keys.every(d=> e[d] == payload[d]));
   if(!data) return null;
+  if(store == 'users'){    
+    user.set(data);
+  }
   return data;    
 }
 
 
 /** Map status to todos */
 export const mapTodo=()=>{
-  let todos = getStore('todos');
-  if(!todos) return null;
-  return todos.map(todo=>{
-    let status = new Date(new Date().toDateString()) > new Date(todo.date)? 0: 1;
-    return {...todo, status};
-  })
+  try {
+    let data = getStore('todos');
+    if(!data) return null;
+    data = data.filter(e=>e.id).map(todo=>{
+      let status = new Date(new Date().toDateString()) > new Date(todo.date)? 0: 1;
+      return {...todo, status, completed: false};
+    });  
+    // replaceStore('todos', data)
+    todos.set(data);
+  
+  } catch (e) {
+   console.log(e);
+  }
 }
 
+export const test=()=>{
+  alert('test');
+}
 
 /** Filters out todo with future or present date */
 export const mapActiveTodo=()=>{
