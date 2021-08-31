@@ -1,6 +1,6 @@
 <script>
 	import { open } from './../../Store/store.js';
-	import { getStore, putToStore, replaceStore } from './../../Utilities/storage.js';
+	import { getStore, putToStore, replaceStore, updateTodoStatus } from './../../Utilities/storage.js';
   import { Link, useNavigate } from 'svelte-navigator';
   import { debug, onDestroy, onMount } from "svelte/internal";
   import { windowPort } from '../../Utilities/Sizers';
@@ -35,10 +35,11 @@
       let isDone = putToStore('todos', payload);
       if(!isDone) return errorMessage = "Oops! Something went wrong, please retry";
     }else{
-      let data = getStore('todos');
-      let index = data.findIndex(e=>e.id == id);
-      data[index] = {...data[index], payload};
-      replaceStore('todos', data);
+      updateTodoStatus({ ...payload, id});
+      // let data = getStore('todos');
+      // let index = data.findIndex(e=>e.id == id);
+      // data[index] = ;
+      // replaceStore('todos', data);
       return open.set(false);
        
     }

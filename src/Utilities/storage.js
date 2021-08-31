@@ -1,4 +1,13 @@
 import { todos, user } from "../Store/store";
+// import {onDestroy} from 'svelte'
+let ID;
+
+let unsubscribe = user.subscribe((d)=>ID = d.id);
+
+// alert(ID)
+// onDestroy(()=>{
+//   unsubscribe
+// })
 
 /** Adds new data to localstorage */
 export const putToStore=(store, payload)=>{
@@ -22,11 +31,21 @@ export const putToStore=(store, payload)=>{
 
 export const replaceStore=(store, payload)=>{
   localStorage[store] = JSON.stringify(payload);
-  
+  // console.log(getStore('todos'));  
   if(store == 'todos'){
     todos.set(payload);
   }
   return payload;
+}
+
+export const updateTodoStatus=(payload)=>{    
+  // console.log(payload);
+  let content = getStore('todos');
+  if(!content) return;
+  let index = content.findIndex(e=>e.id == payload.id);
+  // console.log(index);
+  content[index] = {...content[index], ...payload};
+ return replaceStore('todos', content); 
 }
 
 /**
@@ -93,11 +112,12 @@ export const mapTodo=()=>{
   try {
     let data = getStore('todos');
     if(!data) return null;
-    data = data.filter(e=>e.id).map(todo=>{
+    data = data.filter(e=>e.id  && e.userId == ID).map(todo=>{
       let status = new Date(new Date().toDateString()) > new Date(todo.date)? 0: 1;
-      return {...todo, status, completed: false};
-    });  
-    // replaceStore('todos', data)
+      // console.log(todo.payload);
+      // delete todo.payload;
+      return {...todo, status};
+    });
     todos.set(data);
   
   } catch (e) {

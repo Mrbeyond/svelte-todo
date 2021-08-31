@@ -1,12 +1,14 @@
 <script>
-	import { todos, open } from './../../Store/store.js';
-  import { mapTodo, replaceStore } from '../../Utilities/storage';
+	import { todos, open, user } from './../../Store/store.js';
+  import { mapTodo, replaceStore, updateTodoStatus } from '../../Utilities/storage';
   import Fa from 'svelte-fa';
   import { faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons';
   import Dialog, { Title, Content, Actions } from '@smui/dialog';
   import Button, { Label } from '@smui/button';
   import AddTodo from '../Form/AddTodo.svelte';
   import Checkbox from '@smui/checkbox';
+  import { navigate } from 'svelte-navigator';
+  import { onMount, onDestroy } from 'svelte';
   
   let heads = ['S/N', 'Title', 'Details', 'Time', 'Status', 'Actions' ];
   let pad;
@@ -15,9 +17,19 @@
   let details = "";
   let date = "";
   let id = null;
-  $: {
+  $: {    
     mapTodo();
+    if(!$user) navigate('/')
+    
   }
+  onMount(()=>{
+    // console.log($user);
+    if(!$user) navigate('/')
+  });
+
+  onDestroy(()=>{
+    replaceStore('todos', $todos);
+  })
 
   let selectedTodo = {};
 
@@ -80,9 +92,14 @@
       </Button>
     </Actions>
   </Dialog>
+  <div style="display: flex; justify-content:space-between">
+  <div class="left flez-btw-mid">
+      <Label> <strong> Hi {$user.username},</strong></Label>
+    </div>
+    <div class="right"> 
+      <Button on:click={addToTodo} class="m-btn white" style="margin-bottom: 0px;">ADD More</Button>
+    </div>
 
-  <div class="right"> 
-    <Button on:click={addToTodo} class="m-btn white" style="margin-bottom: 0px;">ADD More</Button>
   </div>
   <hr>
   <table style=" width:100%; max-width:100%; ">    
@@ -104,7 +121,9 @@
         <td> 
           <span class:pad>
             {todo.status? 'Active':'Elapsed'}
-            <Checkbox on:change={()=>(todo.completed = !todo.completed, console.log(todo))} checked={todo.completed} />
+            <Checkbox checked={todo.completed}
+            on:change={()=>(todo.completed = !todo.completed, updateTodoStatus(todo))}
+            />
           </span> 
         </td>
         <td> 
