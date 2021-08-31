@@ -1,6 +1,6 @@
 <script>
 	import { todos, open, user } from './../../Store/store.js';
-  import { mapTodo, replaceStore, updateTodoStatus } from '../../Utilities/storage';
+  import { getStore, mapTodo, replaceStore, updateTodoStatus } from '../../Utilities/storage';
   import Fa from 'svelte-fa';
   import { faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons';
   import Dialog, { Title, Content, Actions } from '@smui/dialog';
@@ -39,7 +39,8 @@
   }
   
   const deleteTodo=(id)=>{
-    let tempTodo  = [...$todos];
+    let tempTodo  = getStore('todos');
+    if(!tempTodo) return;
     if(!selectedTodo.id || (selectedTodo.id && selectedTodo.id != id)){
       return selectedTodo = tempTodo.find(e=> e.id == id);
     }
