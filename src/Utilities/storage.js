@@ -2,7 +2,7 @@ import { todos, user } from "../Store/store";
 // import {onDestroy} from 'svelte'
 let ID;
 
-let unsubscribe = user.subscribe((d)=>ID = d.id);
+let unsubscribe = user.subscribe((d)=> ID = d.id? d.id:null);
 
 // alert(ID)
 // onDestroy(()=>{
@@ -111,7 +111,8 @@ export const getFromListStore=(store, payload)=>{
 export const mapTodo=()=>{
   try {
     let data = getStore('todos');
-    if(!data) return null;
+    if(!data || !ID) return null;
+
     data = data.filter(e=>e.id  && e.userId == ID).map(todo=>{
       let status = new Date(new Date().toDateString()) > new Date(todo.date)? 0: 1;
       // console.log(todo.payload);
